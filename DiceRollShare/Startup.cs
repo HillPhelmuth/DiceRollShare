@@ -32,11 +32,11 @@ namespace DiceRollShare
             services.AddServerSideBlazor();
             services.AddSingleton<WeatherForecastService>();
             services.AddSingleton<DieRollService>();
-            services.AddSignalR().AddAzureSignalR(options =>
-            {
-                options.ServerStickyMode =
-                    Microsoft.Azure.SignalR.ServerStickyMode.Required;
-            });
+            //services.AddSignalR().AddAzureSignalR(options =>
+            //{
+            //    options.ServerStickyMode =
+            //        Microsoft.Azure.SignalR.ServerStickyMode.Required;
+            //});
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
