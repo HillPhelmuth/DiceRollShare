@@ -1,0 +1,78 @@
+﻿@page "/"
+@inject DieRollService DieRollService
+@inject NavigationManager NavigationManager
+
+<h1 class="text-center">Die Roller</h1>
+<br />
+<div class="dicecontent">
+    <div class="die @RollDisplay" data-face="@RollResult">
+        <figure class="face face-1"></figure>
+        <figure class="face face-2"></figure>
+        <figure class="face face-3"></figure>
+        <figure class="face face-4"></figure>
+        <figure class="face face-5"></figure>
+        <figure class="face face-6"></figure>
+        <figure class="face face-7"></figure>
+        <figure class="face face-8"></figure>
+        <figure class="face face-9"></figure>
+        <figure class="face face-10"></figure>
+        <figure class="face face-11"></figure>
+        <figure class="face face-12"></figure>
+        <figure class="face face-13"></figure>
+        <figure class="face face-14"></figure>
+        <figure class="face face-15"></figure>
+        <figure class="face face-16"></figure>
+        <figure class="face face-17"></figure>
+        <figure class="face face-18"></figure>
+        <figure class="face face-19"></figure>
+        <figure class="face face-20"></figure>
+    </div>
+</div>
+<button class="btn btn-primary" @onclick="RollDice">Roll</button>
+@code {
+    //private static event EventHandler<DieRollArgs> OnDieRoll;
+    HubConnection connection;
+    public int RollResult { get; set; }
+    public int SharedResult { get; set; }
+    public string RollDisplay { get; set; }
+    string rollDisplay = "";
+    //bool isRolling = true;
+
+    protected override async Task OnInitializedAsync()
+    {
+        connection = new HubConnectionBuilder()
+            .WithUrl(NavigationManager.ToAbsoluteUri("/dieHub"))
+            .Build();
+        connection.On<int>("showResult", this.ShowResult);
+        connection.On<string>("showRolling", this.ShowRolling);
+        await connection.StartAsync();
+    }
+
+    async Task RollDice()
+    {
+
+        rollDisplay = "rolling";
+        await connection.SendAsync("SendRolling", rollDisplay);
+        //isRolling = true;
+        await Task.Delay(3000);
+        SharedResult = DieRollService.Result;
+        await connection.SendAsync("SendRoll", SharedResult);
+        rollDisplay = "";
+
+    }
+    Task ShowResult(int rollResult)
+    {
+        RollResult = rollResult;
+        RollDisplay = "";
+        //isRolling = false;
+        StateHasChanged();
+        return Task.CompletedTask;
+    }
+    Task ShowRolling(string rolling)
+    {
+        RollDisplay = rolling;
+        StateHasChanged();
+        return Task.CompletedTask;
+    }
+
+}
