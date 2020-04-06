@@ -2,7 +2,7 @@
 @inject DieRollService DieRollService
 @inject NavigationManager NavigationManager
 
-<h1 class="text-center">Die Roller</h1>
+<h1 class="text-center">Shared Roll</h1>
 <br />
 <div class="dicecontent">
     <div class="die @RollDisplay" data-face="@RollResult">
@@ -28,16 +28,18 @@
         <figure class="face face-20"></figure>
     </div>
 </div>
-<button class="btn btn-primary" @onclick="RollDice">Roll</button>
+<br />
+<div class="text-center">
+    <button class="btn btn-primary" @onclick="RollDice">Roll</button>
+</div>
 @code {
-    //private static event EventHandler<DieRollArgs> OnDieRoll;
+    
     HubConnection connection;
     public int RollResult { get; set; }
     public int SharedResult { get; set; }
     public string RollDisplay { get; set; }
     string rollDisplay = "";
-    //bool isRolling = true;
-
+   
     protected override async Task OnInitializedAsync()
     {
         connection = new HubConnectionBuilder()
@@ -50,10 +52,10 @@
 
     async Task RollDice()
     {
-
+        if (rollDisplay == "rolling")
+            return;
         rollDisplay = "rolling";
         await connection.SendAsync("SendRolling", rollDisplay);
-        //isRolling = true;
         await Task.Delay(3000);
         SharedResult = DieRollService.Result;
         await connection.SendAsync("SendRoll", SharedResult);
@@ -64,7 +66,6 @@
     {
         RollResult = rollResult;
         RollDisplay = "";
-        //isRolling = false;
         StateHasChanged();
         return Task.CompletedTask;
     }
